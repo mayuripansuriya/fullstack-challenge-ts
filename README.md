@@ -56,3 +56,5 @@ I want to be able to order a job for specific times rather than for a fixed one
 Task A : `GET` `:jobId/cancel`
 Task B : `GET` `:shiftId/cancel`
 Task C : `GET` `talent/:talentId/cancel`
+
+I have also updated logic of create job to achieve stretch goal.
