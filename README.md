@@ -50,3 +50,9 @@ I want to be able to cancel all shifts booked for a specific talent
 
 **AS** a Company
 I want to be able to order a job for specific times rather than for a fixed one
+
+### I have created following apis
+
+Task A : `GET` `:jobId/cancel`
+Task B : `GET` `:shiftId/cancel`
+Task C : `GET` `talent/:talentId/cancel`
