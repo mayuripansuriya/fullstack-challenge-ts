@@ -66,10 +66,10 @@ export class ShiftController {
         HttpStatus.BAD_REQUEST
       );
     }
-    this.shiftService.cancelShift(shiftId);
+    const data = await this.shiftService.cancelShift(shiftId);
 
     return new ResponseDto<CancelShiftResponse>(
-      new CancelShiftResponse("shift cancelled successfully")
+      new CancelShiftResponse(data, "shift cancelled successfully")
     );
   }
 
@@ -80,7 +80,7 @@ export class ShiftController {
   ): Promise<ResponseDto<CancelShiftResponse>> {
     await this.shiftService.cancelShiftsForTalent(talentId);
     return new ResponseDto<CancelShiftResponse>(
-      new CancelShiftResponse("shift cancelled successfully")
+      new CancelShiftResponse(null, "shift cancelled successfully")
     );
   }
 }
