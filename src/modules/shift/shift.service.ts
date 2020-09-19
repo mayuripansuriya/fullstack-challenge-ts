@@ -1,13 +1,13 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
-import { Shift } from './shift.entity';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, UpdateResult } from "typeorm";
+import { Injectable } from "@nestjs/common";
+import { Shift } from "./shift.entity";
 
 @Injectable()
 export class ShiftService {
   constructor(
     @InjectRepository(Shift)
-    private readonly repository: Repository<Shift>,
+    private readonly repository: Repository<Shift>
   ) {}
 
   public async getShifts(uuid: string): Promise<Shift[]> {
@@ -19,9 +19,13 @@ export class ShiftService {
   }
 
   public async bookTalent(talent: string, shiftId: string): Promise<void> {
-    this.repository.findOne(shiftId).then(shift => {
+    this.repository.findOne(shiftId).then((shift) => {
       shift.talentId = talent;
       this.repository.save(shift);
     });
+  }
+
+  public cancelAllShifts(uuid: string): Promise<UpdateResult> {
+    return this.repository.update({ jobId: uuid }, { cancelledAt: new Date() });
   }
 }

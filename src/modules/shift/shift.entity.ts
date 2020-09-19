@@ -6,12 +6,12 @@ import {
   VersionColumn,
   UpdateDateColumn,
   Entity,
-} from 'typeorm';
-import { Job } from '../job/job.entity';
+} from "typeorm";
+import { Job } from "../job/job.entity";
 
 @Entity()
 export class Shift {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @VersionColumn()
@@ -19,7 +19,7 @@ export class Shift {
 
   @ManyToOne(
     () => Job,
-    job => job.shifts,
+    (job) => job.shifts
   )
   job: Job;
 
@@ -34,6 +34,9 @@ export class Shift {
 
   @Column()
   endTime: Date;
+
+  @Column({ nullable: true })
+  cancelledAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;
