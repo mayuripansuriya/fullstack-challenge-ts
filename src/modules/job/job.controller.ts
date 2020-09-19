@@ -26,7 +26,7 @@ export class JobController {
     @Body(new ValidationPipe<JobRequest>())
     dto: JobRequest
   ): Promise<ResponseDto<JobRequestResponse>> {
-    const job = await this.jobService.createJob(UUIDv4(), dto.start, dto.end);
+    const job = await this.jobService.createJob(UUIDv4(), dto);
     return new ResponseDto<JobRequestResponse>(new JobRequestResponse(job.id));
   }
 

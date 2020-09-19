@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { v4 as UUIDv4 } from "uuid";
 import { eachDayOfInterval } from "date-fns";
@@ -6,6 +6,7 @@ import { Repository } from "typeorm";
 import { Job } from "./job.entity";
 import { Shift } from "../shift/shift.entity";
 import { ShiftService } from "../shift/shift.service";
+import * as moment from "moment";
 
 @Injectable()
 export class JobService {
@@ -15,20 +16,69 @@ export class JobService {
     private readonly shiftService: ShiftService
   ) {}
 
-  async createJob(uuid: string, date1: Date, date2: Date): Promise<Job> {
-    date1.setUTCHours(8);
-    date2.setUTCHours(17);
+  async createJob(
+    uuid: string,
+    {
+      start,
+      end,
+      shiftStartTime,
+      shiftEndTime,
+    }: {
+      start: Date;
+      end: Date;
+      shiftStartTime?: moment.MomentInput;
+      shiftEndTime?: moment.MomentInput;
+    }
+  ): Promise<Job> {
+    let startHour = 8;
+    let endHour = 17;
+    let startMinute = 0;
+    let endMinute = 0;
+    if (!moment(start).isBefore(end)) {
+      throw new HttpException(
+        "end date should be after start date",
+        HttpStatus.CONFLICT
+      );
+    }
+
+    if (shiftStartTime && shiftEndTime) {
+      let startTime = moment(shiftStartTime, "HH:mm:ss a");
+      let endTime = moment(shiftEndTime, "HH:mm:ss a");
+      // calculate total duration
+      let duration = moment.duration(endTime.diff(startTime));
+      // duration in hours
+      let hours = parseInt(String(duration.asHours()));
+      // duration in minutes
+      if (hours > 8 || hours < 2) {
+        throw new HttpException(
+          "shift duration cannot be more than 8 hours or less than 2 hours",
+          HttpStatus.CONFLICT
+        );
+      }
+      startHour = startTime.get("hour");
+      endHour = endTime.get("hour");
+
+      startMinute = startTime.get("minute");
+      endMinute = endTime.get("minute");
+    }
+
+    start.setUTCHours(startHour);
+    end.setUTCHours(endHour);
+    start.setUTCMinutes(startMinute);
+    end.setUTCMinutes(endMinute);
     const job = new Job();
     job.id = uuid;
     job.companyId = UUIDv4();
-    job.startTime = date1;
-    job.endTime = date2;
+    job.startTime = start;
+    job.endTime = end;
 
-    job.shifts = eachDayOfInterval({ start: date1, end: date2 }).map((day) => {
+    job.shifts = eachDayOfInterval({ start: start, end: end }).map((day) => {
       const startTime = new Date(day);
-      startTime.setUTCHours(8);
+      startTime.setUTCHours(startHour);
+      startTime.setUTCMinutes(startMinute);
       const endTime = new Date(day);
-      endTime.setUTCHours(17);
+      endTime.setUTCHours(endHour);
+      endTime.setUTCMinutes(endMinute);
       const shift = new Shift();
       shift.id = UUIDv4();
       shift.job = job;

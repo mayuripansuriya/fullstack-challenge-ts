@@ -42,7 +42,7 @@ export class ShiftService {
     return this.repository.save({ id, cancelledAt: new Date() });
   }
 
-  public cancelAllShifts(uuid: string): Promise<UpdateResult> {
+  public cancelAllShifts(uuid: string): Promise<any> {
     return this.repository.update({ jobId: uuid }, { cancelledAt: new Date() });
   }
 

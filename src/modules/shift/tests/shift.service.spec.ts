@@ -114,4 +114,16 @@ describe("ShiftService", () => {
       });
     });
   });
+
+  describe("cancelAllShifts", () => {
+    it("should cancel a shift", async () => {
+      const shift = new Shift();
+      jest.spyOn(shiftRepository, "update").mockImplementation();
+      await shiftService.cancelAllShifts(uuid);
+      expect(shiftRepository.update).toHaveBeenCalledWith(
+        { jobId: uuid },
+        { cancelledAt: new Date() }
+      );
+    });
+  });
 });

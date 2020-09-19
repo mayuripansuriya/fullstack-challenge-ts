@@ -1,5 +1,12 @@
-import { IsNotEmpty, IsDate, IsUUID, MinDate } from "class-validator";
+import {
+  IsNotEmpty,
+  IsDate,
+  IsUUID,
+  MinDate,
+  IsOptional,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { MomentInput } from "moment";
 
 export class JobRequest {
   @IsNotEmpty()
@@ -21,4 +28,10 @@ export class JobRequest {
   })
   @IsNotEmpty()
   end: Date;
+
+  @IsOptional()
+  shiftStartTime?: MomentInput;
+
+  @IsOptional()
+  shiftEndTime?: MomentInput;
 }
