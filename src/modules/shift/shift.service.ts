@@ -10,10 +10,6 @@ export class ShiftService {
     private readonly repository: Repository<Shift>
   ) {}
 
-  public get(uuid: string): Promise<Shift> {
-    return this.repository.findOneOrFail(uuid);
-  }
-
   public async getShifts(uuid: string): Promise<Shift[]> {
     return this.repository.find({
       where: {
@@ -22,8 +18,21 @@ export class ShiftService {
     });
   }
 
-  public async bookTalent(talent: string, shiftId: string): Promise<void> {
-    this.repository.findOne(shiftId).then((shift) => {
+  public get(uuid: string): Promise<Shift> {
+    return this.repository.findOneOrFail(uuid);
+  }
+
+  public getShiftsForTalent(uuid: string): Promise<Shift[]> {
+    return this.repository.find({
+      where: {
+        talentId: uuid,
+        cancelledAt: null,
+      },
+    });
+  }
+
+  public bookTalent(shiftId: string, talent: string): Promise<void> {
+    return this.repository.findOne({ where: { id: shiftId } }).then((shift) => {
       shift.talentId = talent;
       this.repository.save(shift);
     });
@@ -35,5 +44,17 @@ export class ShiftService {
 
   public cancelAllShifts(uuid: string): Promise<UpdateResult> {
     return this.repository.update({ jobId: uuid }, { cancelledAt: new Date() });
+  }
+
+  public async cancelShiftsForTalent(uuid: string): Promise<any> {
+    const shifts = await this.getShiftsForTalent(uuid);
+    shifts.map(({ jobId, startTime, endTime, id }) => {
+      this.repository.save({
+        jobId,
+        startTime,
+        endTime,
+      });
+      this.cancelShift(id);
+    });
   }
 }

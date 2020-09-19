@@ -17,6 +17,7 @@ import { CancelShiftResponse } from "./dto/CancelShiftResponse";
 import { ShiftService } from "./shift.service";
 import { ValidationPipe } from "../ValidationPipe";
 import { BookTalentRequest } from "./dto/BookTalentRequest";
+
 @Controller("shift")
 export class ShiftController {
   constructor(private readonly shiftService: ShiftService) {}
@@ -34,7 +35,8 @@ export class ShiftController {
             shift.talentId,
             shift.jobId,
             shift.startTime,
-            shift.endTime
+            shift.endTime,
+            shift.cancelledAt
           );
         })
       )
@@ -66,6 +68,17 @@ export class ShiftController {
     }
     this.shiftService.cancelShift(shiftId);
 
+    return new ResponseDto<CancelShiftResponse>(
+      new CancelShiftResponse("shift cancelled successfully")
+    );
+  }
+
+  @Get("talent/:talentId/cancel")
+  @HttpCode(200)
+  async cancelShiftsForTalent(
+    @Param("talentId", new ParseUUIDPipe()) talentId: string
+  ): Promise<ResponseDto<CancelShiftResponse>> {
+    await this.shiftService.cancelShiftsForTalent(talentId);
     return new ResponseDto<CancelShiftResponse>(
       new CancelShiftResponse("shift cancelled successfully")
     );
