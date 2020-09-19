@@ -10,6 +10,10 @@ export class ShiftService {
     private readonly repository: Repository<Shift>
   ) {}
 
+  public get(uuid: string): Promise<Shift> {
+    return this.repository.findOneOrFail(uuid);
+  }
+
   public async getShifts(uuid: string): Promise<Shift[]> {
     return this.repository.find({
       where: {
@@ -23,6 +27,10 @@ export class ShiftService {
       shift.talentId = talent;
       this.repository.save(shift);
     });
+  }
+
+  public async cancelShift(id: string): Promise<Shift> {
+    return this.repository.save({ id, cancelledAt: new Date() });
   }
 
   public cancelAllShifts(uuid: string): Promise<UpdateResult> {
