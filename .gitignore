@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+/coverage
+database.sqlite
+.DS_Store
