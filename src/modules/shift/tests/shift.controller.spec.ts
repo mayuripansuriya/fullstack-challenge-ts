@@ -65,7 +65,7 @@ describe("ShiftController", () => {
     await expect(shiftController.cancelShift(shiftId)).rejects.toThrow();
   });
 
-  it("should cancel a talent", async () => {
+  it("should cancel shifts for a talent", async () => {
     const talentId = "1234";
     const shifts = [new Shift()];
     jest.spyOn(shiftService, "cancelShiftsForTalent").mockResolvedValue(shifts);

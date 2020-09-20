@@ -116,7 +116,7 @@ describe("ShiftService", () => {
   });
 
   describe("cancelAllShifts", () => {
-    it("should cancel a shift", async () => {
+    it("should cancel all shifts", async () => {
       const shift = new Shift();
       jest.spyOn(shiftRepository, "update").mockImplementation();
       await shiftService.cancelAllShifts(uuid);
