@@ -26,21 +26,25 @@ export class ShiftController {
   async getShifts(
     @Param("jobId", new ParseUUIDPipe()) jobId: string
   ): Promise<ResponseDto<GetShiftsResponse>> {
-    const shifts = await this.shiftService.getShifts(jobId);
-    return new ResponseDto<GetShiftsResponse>(
-      new GetShiftsResponse(
-        shifts.map((shift) => {
-          return new GetShiftResponse(
-            shift.id,
-            shift.talentId,
-            shift.jobId,
-            shift.startTime,
-            shift.endTime,
-            shift.cancelledAt
-          );
-        })
-      )
-    );
+    try {
+      const shifts = await this.shiftService.getShifts(jobId);
+      return new ResponseDto<GetShiftsResponse>(
+        new GetShiftsResponse(
+          shifts.map((shift) => {
+            return new GetShiftResponse(
+              shift.id,
+              shift.talentId,
+              shift.jobId,
+              shift.startTime,
+              shift.endTime,
+              shift.cancelledAt
+            );
+          })
+        )
+      );
+    } catch (error) {
+      console.log("error-->", error);
+    }
   }
 
   @Patch(":shiftId/book")
@@ -57,20 +61,24 @@ export class ShiftController {
   async cancelShift(
     @Param("shiftId", new ParseUUIDPipe()) shiftId: string
   ): Promise<ResponseDto<CancelShiftResponse>> {
-    const shift = await this.shiftService.get(shiftId);
+    try {
+      const shift = await this.shiftService.get(shiftId);
 
-    //check if shift is already cancelled
-    if (shift.cancelledAt) {
-      throw new HttpException(
-        "Shift Already cancelled.",
-        HttpStatus.BAD_REQUEST
+      //check if shift is already cancelled
+      if (shift.cancelledAt) {
+        throw new HttpException(
+          "Shift Already cancelled.",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      const data = await this.shiftService.cancelShift(shiftId);
+
+      return new ResponseDto<CancelShiftResponse>(
+        new CancelShiftResponse(data, "shift cancelled successfully")
       );
+    } catch (error) {
+      console.log("error-->", error);
     }
-    const data = await this.shiftService.cancelShift(shiftId);
-
-    return new ResponseDto<CancelShiftResponse>(
-      new CancelShiftResponse(data, "shift cancelled successfully")
-    );
   }
 
   @Get("talent/:talentId/cancel")
@@ -78,9 +86,13 @@ export class ShiftController {
   async cancelShiftsForTalent(
     @Param("talentId", new ParseUUIDPipe()) talentId: string
   ): Promise<ResponseDto<CancelShiftResponse>> {
-    await this.shiftService.cancelShiftsForTalent(talentId);
-    return new ResponseDto<CancelShiftResponse>(
-      new CancelShiftResponse(null, "shift cancelled successfully")
-    );
+    try {
+      await this.shiftService.cancelShiftsForTalent(talentId);
+      return new ResponseDto<CancelShiftResponse>(
+        new CancelShiftResponse(null, "shift cancelled successfully")
+      );
+    } catch (error) {
+      console.log("error-->", error);
+    }
   }
 }
